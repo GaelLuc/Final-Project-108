@@ -6,10 +6,10 @@
 #### Is a game where you are the last person in the zombie apocalypse and you are defending your house. By shooting the zombies, causing them to be destroyed
 
 ### Phase 1
-- [ ] There is a Hero on the screen
-- [ ] The Hero moves up or down whenever the arrow keys are pressed
-- [ ] The Hero keeps moving when the arrow keys are held down, but stops moving if the keys are released.
-- [ ] The Hero cannot be moved offscreen
+- [x] There is a Hero on the screen
+- [x] The Hero moves up or down whenever the arrow keys are pressed
+- [x] The hero is constantly moving towards the last place the player moved (Changed this to make the game more difficult/fun)
+- [x] The Hero cannot be moved offscreen
 
 ### Phase 2
 - [ ] Zombies appear randomly and continuously
