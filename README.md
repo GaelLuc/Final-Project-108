@@ -13,13 +13,13 @@
 #### Link to Demo: https://youtu.be/7LvwFIX20y0
 
 ### Phase 2
-- [ ] Zombies appear randomly and continuously
-- [ ] Zombies move right(towards the Hero’s house)
-- [ ] In a random time a zombie will spawn, but with a higher speed 
-- [ ] The player can press the spacebar to create a laser projectile
-- [ ] The laser projectile moves forward(Left)
-- [ ] The laser is destroyed when it hits the top of the screen
-- [ ] If a laser collides with an Zombie, the Zombie and the laser are both destroyed and the player gets a point
+- [x] Zombies appear randomly and continuously
+- [x] Zombies move left(towards the Hero’s house)
+- [x] In a random time a zombie will spawn, but with a higher speed 
+- [x] The player can press the spacebar to create a laser projectile
+- [x] The laser projectile moves forward(Left)
+- [x] The laser is destroyed when it hits the top of the screen
+- [x] If a laser collides with an Zombie, the Zombie and the laser are both destroyed and the player gets a point
 
 ### Phase 3
 - [ ] Power up randomly shows up in the little area where the Hero will be

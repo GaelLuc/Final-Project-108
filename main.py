@@ -48,6 +48,16 @@ def control_hero(world: World, key: str):
     elif key == "down":
         world.hero_speed = HERO_SPEED
 
+def create_house() -> DesignerObject:
+    """ Create a zombie randomly on the right-side of the screen """
+    house = emoji("🏠")
+    house.scale_x = 3
+    house.scale_y = 3
+    house.anchor = 'midbottom'
+    house.x = 30
+    house.y = get_height()/2
+    return house
+
 def create_laser() -> DesignerObject:
     """ Create a Laser"""
     return rectangle("red", 15, 5)
@@ -168,6 +178,7 @@ def flash_game_over(world):
 
 
 when('starting', create_world)
+when("updating", create_house)
 when("updating", move_hero)
 when("updating", bounce_hero)
 when("typing", control_hero)
