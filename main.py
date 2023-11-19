@@ -4,17 +4,22 @@ from random import randint
 INITIAL_SPEED = 0
 HERO_SPEED = 5
 LASER_SPEED = 5
-ZOMBIE_SPEED = 5
+ZOMBIE_SPEED = 3
+FAST_ZOMBIE_SPEED = 5
 @dataclass
 class World:
     hero: DesignerObject
     hero_speed: int
     lasers: list[DesignerObject]
     zombies: list[DesignerObject]
+    speed_zombies: list[DesignerObject]
+    score: int
+    counter: DesignerObject
 
 def create_world() -> World:
     """ Create the world """
-    return World(create_hero(), INITIAL_SPEED, [], [])
+    return World(create_hero(), INITIAL_SPEED, [], [], [], 0,
+                 text("black", "Score: ", 35, int(get_width() * (1/2)), int(get_height() * (1 / 8))))
 def create_hero() -> DesignerObject:
     """ Create the hero """
     hero = emoji("🤺")
@@ -81,32 +86,84 @@ def create_zomie() -> DesignerObject:
     zombie.scale_y = 1
     zombie.anchor = 'midbottom'
     zombie.x = get_width()
-    zombie.y = randint(0, get_height())
+    zombie.y = randint(50, get_height()-50)
     return zombie
 
+def create_speed_zomie() -> DesignerObject:
+    """ Create a zombie randomly on the right-side of the screen """
+    zombie = emoji("zombie")
+    zombie.scale_x = 1
+    zombie.scale_y = 1
+    zombie.anchor = 'midbottom'
+    zombie.x = get_width()
+    zombie.y = randint(100, get_height()-100)
+    return zombie
 def make_zombies(world: World):
     """ Create a new zombie at random times, if there aren't enough zombies """
-    random_chance = randint(1, 10) == 1
+    random_chance = randint(1, 20) == 1
+    special_chance = randint(1, 40) == 1
     if len(world.zombies) < 10 and random_chance:
         world.zombies.append(create_zomie())
+    if world.score >= 20 and len(world.zombies) < 10 and special_chance:
+        world.speed_zombies.append(create_speed_zomie())
 
 def zombie_run(world: World):
     """ Move all the zombies to the left """
     for zombie in world.zombies:
         zombie.x -= ZOMBIE_SPEED
-
-def speedup_zombies(world: World):
-    """ Make each zombie get a little bit faster """
-    for zombie in world.zombies:
-        zombie.x -= .01
-        #zombie.scale_y += .01
+    for zombie in world.speed_zombies:
+        zombie.x -= FAST_ZOMBIE_SPEED
 
 def zombies_cross_the_line(world: World) -> bool:
     """ Return True if there are any zombies that cross the line """
     for zombie in world.zombies:
-        if zombie.x <= 100:
+        if zombie.x <= 100 or colliding(world.hero, zombie):
+            return True
+    for speed_zombie in world.speed_zombies:
+        if speed_zombie.x <= 100 or colliding(world.hero, speed_zombie):
             return True
     return False
+
+def collide_laser_zombie(world: World):
+    destroyed_zombies = []
+    destroyed_lasers = []
+    for laser in world.lasers:
+        for zombie in world.zombies:
+            if colliding(laser, zombie):
+                destroyed_lasers.append(laser)
+                destroyed_zombies.append(zombie)
+                world.score += 1
+    world.lasers = filter_from(world.lasers, destroyed_lasers)
+    world.zombies = filter_from(world.zombies, destroyed_zombies)
+
+def collide_laser_speed_zombie(world: World):
+    destroyed_speed_zombies = []
+    destroyed_lasers = []
+    for laser in world.lasers:
+        for speed_zombie in world.speed_zombies:
+            if colliding(laser, speed_zombie):
+                destroyed_lasers.append(laser)
+                destroyed_speed_zombies.append(speed_zombie)
+                world.score += 1
+    world.lasers = filter_from(world.lasers, destroyed_lasers)
+    world.speed_zombies = filter_from(world.speed_zombies, destroyed_speed_zombies)
+
+def filter_from(old_list: list[DesignerObject], elements_to_not_keep: list[DesignerObject]) -> list[DesignerObject]:
+    new_values = []
+    for item in old_list:
+        if item in elements_to_not_keep:
+            destroy(item)
+        else:
+            new_values.append(item)
+    return new_values
+
+def update_score(world):
+    """ Update the score """
+    world.counter.text = "Score: " + str(world.score)
+
+def flash_game_over(world):
+    """ Show the game over message """
+    world.counter.text = "GAME OVER! Your score was " + str(world.score)
 
 
 
@@ -119,6 +176,8 @@ when("updating", make_laser_fly)
 when("updating", destroy_lasers_offscreen)
 when("updating", make_zombies)
 when("updating", zombie_run)
-#when("updating", speedup_zombies)
-when(zombies_cross_the_line, pause)
+when('updating', collide_laser_zombie)
+when("updating", collide_laser_speed_zombie)
+when("updating", update_score)
+when(zombies_cross_the_line, flash_game_over, pause)
 start()
