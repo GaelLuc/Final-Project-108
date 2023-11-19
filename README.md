@@ -20,6 +20,7 @@
 - [x] The laser projectile moves forward(Left)
 - [x] The laser is destroyed when it hits the top of the screen
 - [x] If a laser collides with an Zombie, the Zombie and the laser are both destroyed and the player gets a point
+#### Link to Demo: https://youtu.be/6Jk7fc9d9ys
 
 ### Phase 3
 - [ ] Power up randomly shows up in the little area where the Hero will be
