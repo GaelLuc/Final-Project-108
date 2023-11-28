@@ -13,12 +13,13 @@ class World:
     lasers: list[DesignerObject]
     zombies: list[DesignerObject]
     speed_zombies: list[DesignerObject]
+    stars: list[DesignerObject]
     score: int
     counter: DesignerObject
 
 def create_world() -> World:
     """ Create the world """
-    return World(create_hero(), INITIAL_SPEED, [], [], [], 0,
+    return World(create_hero(), INITIAL_SPEED, [], [], [], [], 0,
                  text("black", "Score: ", 35, int(get_width() * (1/2)), int(get_height() * (1 / 8))))
 def create_hero() -> DesignerObject:
     """ Create the hero """
@@ -88,6 +89,26 @@ def destroy_lasers_offscreen(world: World):
         else:
             destroy(laser)
     world.lasers = kept
+
+def create_star() -> DesignerObject:
+    """ Create a star randomly on the left-side of the screen, when conditions are met"""
+    star = emoji("🌟")
+    star.scale_x = 0.6
+    star.scale_y = 0.6
+    star.anchor = 'midbottom'
+    star.x = get_width() * (1/8)
+    star.y = randint(50, get_height() - 50)
+    return star
+
+def make_stars_randomly(world: World):
+    """ Create a new star at random times, only when there is no stars """
+    star_chance = randint(1, 10) == 1
+    if world.score >= 20 and len(world.stars) < 1 and star_chance:
+        print(world.stars)
+        world.stars.append(create_star())
+        print(world.stars)
+
+
 
 def create_zomie() -> DesignerObject:
     """ Create a zombie randomly on the right-side of the screen """
@@ -185,6 +206,7 @@ when("typing", control_hero)
 when('typing', shoot_laser)
 when("updating", make_laser_fly)
 when("updating", destroy_lasers_offscreen)
+when("updating", make_stars_randomly)
 when("updating", make_zombies)
 when("updating", zombie_run)
 when('updating', collide_laser_zombie)
