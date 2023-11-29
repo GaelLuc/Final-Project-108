@@ -102,7 +102,7 @@ def create_star() -> DesignerObject:
 
 def make_stars_randomly(world: World):
     """ Create a new star at random times, only when there is no stars """
-    star_chance = randint(1, 10) == 1
+    star_chance = randint(1, 40) == 1
     if world.score >= 20 and len(world.stars) < 1 and star_chance:
         print(world.stars)
         world.stars.append(create_star())
@@ -179,6 +179,15 @@ def collide_laser_speed_zombie(world: World):
     world.lasers = filter_from(world.lasers, destroyed_lasers)
     world.speed_zombies = filter_from(world.speed_zombies, destroyed_speed_zombies)
 
+def collide_star_hero(world: World):
+    destroyed_stars = []
+    for star in world.stars:
+        if colliding(star, world.hero):
+            destroyed_stars.append(star)
+            #world.score += 1
+            print("Need to add powerup laser")
+    world.stars = filter_from(world.stars, destroyed_stars)
+
 def filter_from(old_list: list[DesignerObject], elements_to_not_keep: list[DesignerObject]) -> list[DesignerObject]:
     new_values = []
     for item in old_list:
@@ -211,6 +220,7 @@ when("updating", make_zombies)
 when("updating", zombie_run)
 when('updating', collide_laser_zombie)
 when("updating", collide_laser_speed_zombie)
+when("updating", collide_star_hero)
 when("updating", update_score)
 when(zombies_cross_the_line, flash_game_over, pause)
 start()
