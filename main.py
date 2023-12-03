@@ -118,6 +118,16 @@ def move_special_laser(world: World):
     for special_laser in world.special_lasers:
         special_laser.x += LASER_SPEED
 
+def destroy_special_lasers_offscreen(world: World):
+    """ Destroy any lasers that are offscreen """
+    kept = []
+    for special_laser in world.special_lasers:
+        if special_laser.x < get_width():
+            kept.append(special_laser)
+        else:
+            destroy(special_laser)
+    world.special_lasers = kept
+
 def create_star() -> DesignerObject:
     """ Create a star randomly on the left-side of the screen, when conditions are met"""
     star = emoji("🌟")
@@ -130,9 +140,9 @@ def create_star() -> DesignerObject:
 
 def make_stars_randomly(world: World):
     """ Create a new star at random times, only when there is no stars """
-    star_chance_50 = randint(1, 40) == 1
-    star_chance_40 = randint(1, 50) == 1
-    star_chance_30 = randint(1, 60) == 1
+    star_chance_50 = randint(1, 50) == 1
+    star_chance_40 = randint(1, 60) == 1
+    star_chance_30 = randint(1, 70) == 1
     star_chance_20 = randint(1, 80) == 1
     star_chance_10 = randint(1, 90) == 1
     # Creating the scale feature for the Stars
@@ -146,12 +156,6 @@ def make_stars_randomly(world: World):
         world.stars.append(create_star())
     elif world.score >= 8 and len(world.stars) < 1 and star_chance_10:
         world.stars.append(create_star())
-
-
-
-
-
-
 
 def create_zomie() -> DesignerObject:
     """ Create a zombie randomly on the right-side of the screen """
@@ -199,28 +203,30 @@ def zombies_cross_the_line(world: World) -> bool:
     return False
 
 def collide_laser_zombie(world: World):
-    destroyed_zombies = []
-    destroyed_lasers = []
-    for laser in world.lasers:
-        for zombie in world.zombies:
-            if colliding(laser, zombie):
-                destroyed_lasers.append(laser)
-                destroyed_zombies.append(zombie)
+    destroyed_lists = deleting_both_colliding_objects(world, world.lasers, world.zombies)
+    world.lasers = filter_from(world.lasers, destroyed_lists[0])
+    world.zombies = filter_from(world.zombies, destroyed_lists[1])
+
+def deleting_both_colliding_objects(world: World, laser_list: list[DesignerObject], character_list: list[DesignerObject]):
+    final_list = []
+    destroyed_laser_list = []
+    destroyed_character_list = []
+    for laser in laser_list:
+        for character in character_list:
+            if colliding(laser, character):
+                destroyed_laser_list.append(laser)
+                destroyed_character_list.append(character)
                 world.score += 1
-    world.lasers = filter_from(world.lasers, destroyed_lasers)
-    world.zombies = filter_from(world.zombies, destroyed_zombies)
+    final_list.append(destroyed_laser_list)
+    final_list.append(destroyed_character_list)
+    return final_list
+
 
 def collide_laser_speed_zombie(world: World):
-    destroyed_speed_zombies = []
-    destroyed_lasers = []
-    for laser in world.lasers:
-        for speed_zombie in world.speed_zombies:
-            if colliding(laser, speed_zombie):
-                destroyed_lasers.append(laser)
-                destroyed_speed_zombies.append(speed_zombie)
-                world.score += 1
-    world.lasers = filter_from(world.lasers, destroyed_lasers)
-    world.speed_zombies = filter_from(world.speed_zombies, destroyed_speed_zombies)
+    destroyed_lists = deleting_both_colliding_objects(world, world.lasers, world.speed_zombies)
+    world.lasers = filter_from(world.lasers, destroyed_lists[0])
+    world.speed_zombies = filter_from(world.speed_zombies, destroyed_lists[1])
+
 
 def collide_star_hero(world: World):
     destroyed_stars = []
@@ -229,6 +235,24 @@ def collide_star_hero(world: World):
             destroyed_stars.append(star)
             world.is_special = True
     world.stars = filter_from(world.stars, destroyed_stars)
+
+def collide_special_laser_zombie(world: World):
+    destroyed_zombies = deleting_one_colliding_objects(world, world.special_lasers, world.zombies)
+    world.zombies = filter_from(world.zombies, destroyed_zombies)
+
+def collide_special_laser_speed_zombie(world: World):
+    destroyed_speed_zombies = deleting_one_colliding_objects(world, world.special_lasers, world.speed_zombies)
+    world.speed_zombies = filter_from(world.speed_zombies, destroyed_speed_zombies)
+
+def deleting_one_colliding_objects(world: World, laser_list: list[DesignerObject], character_list: list[DesignerObject]):
+    """Helper function that cuts down repetitive code"""
+    destroyed_character_list = []
+    for laser in laser_list:
+        for character in character_list:
+            if colliding(laser, character):
+                destroyed_character_list.append(character)
+                world.score += 1
+    return destroyed_character_list
 
 def filter_from(old_list: list[DesignerObject], elements_to_not_keep: list[DesignerObject]) -> list[DesignerObject]:
     new_values = []
@@ -265,6 +289,9 @@ when("updating", collide_laser_speed_zombie)
 when("updating", collide_star_hero)
 when("typing", shoot_special_laser)
 when("updating", move_special_laser)
+when("updating", destroy_special_lasers_offscreen)
+when("updating", collide_special_laser_zombie)
+when("updating", collide_special_laser_speed_zombie)
 when("updating", update_score)
 when(zombies_cross_the_line, flash_game_over, pause)
 start()
