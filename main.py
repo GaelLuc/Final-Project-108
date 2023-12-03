@@ -14,12 +14,14 @@ class World:
     zombies: list[DesignerObject]
     speed_zombies: list[DesignerObject]
     stars: list[DesignerObject]
+    special_lasers: list[DesignerObject]
+    is_special: bool
     score: int
     counter: DesignerObject
 
 def create_world() -> World:
     """ Create the world """
-    return World(create_hero(), INITIAL_SPEED, [], [], [], [], 0,
+    return World(create_hero(), INITIAL_SPEED, [], [], [], [], [], False, 0,
                  text("black", "Score: ", 35, int(get_width() * (1/2)), int(get_height() * (1 / 8))))
 def create_hero() -> DesignerObject:
     """ Create the hero """
@@ -65,7 +67,7 @@ def create_laser() -> DesignerObject:
 
 def shoot_laser(world: World, key: str):
     """ Create a laser when the space bar is pressed """
-    if key == 'space':
+    if key == 'space' and not world.is_special:
         new_laser = create_laser()
         laser_position(new_laser, world.hero)
         world.lasers.append(new_laser)
@@ -90,6 +92,32 @@ def destroy_lasers_offscreen(world: World):
             destroy(laser)
     world.lasers = kept
 
+def create_bullet_laser() -> DesignerObject:
+    """ Create a bullet Laser"""
+    return rectangle("gold", 15, 5)
+
+def create_wave_laser() -> DesignerObject:
+    """ Create a wave Laser"""
+    return rectangle('gold', 5, 30)
+
+def shoot_special_laser(world: World, key: str):
+    """ Create a One Special laser when world.is_special is true and the space bar is pressed """
+    if world.is_special and key == 'space':
+        random_chance = randint(1, 2)
+        if random_chance == 1:
+            new_bullet_laser = create_bullet_laser()
+            laser_position(new_bullet_laser, world.hero)
+            world.special_lasers.append(new_bullet_laser)
+        elif random_chance == 2:
+            new_wave_laser = create_wave_laser()
+            laser_position(new_wave_laser, world.hero)
+            world.special_lasers.append(new_wave_laser)
+        world.is_special = False
+
+def move_special_laser(world: World):
+    for special_laser in world.special_lasers:
+        special_laser.x += LASER_SPEED
+
 def create_star() -> DesignerObject:
     """ Create a star randomly on the left-side of the screen, when conditions are met"""
     star = emoji("🌟")
@@ -102,11 +130,26 @@ def create_star() -> DesignerObject:
 
 def make_stars_randomly(world: World):
     """ Create a new star at random times, only when there is no stars """
-    star_chance = randint(1, 40) == 1
-    if world.score >= 20 and len(world.stars) < 1 and star_chance:
-        print(world.stars)
+    star_chance_50 = randint(1, 40) == 1
+    star_chance_40 = randint(1, 50) == 1
+    star_chance_30 = randint(1, 60) == 1
+    star_chance_20 = randint(1, 80) == 1
+    star_chance_10 = randint(1, 90) == 1
+    # Creating the scale feature for the Stars
+    if world.score >= 50 and len(world.stars) < 2 and star_chance_50:
         world.stars.append(create_star())
-        print(world.stars)
+    elif world.score >= 40 and len(world.stars) < 2 and star_chance_40:
+        world.stars.append(create_star())
+    elif world.score >= 30 and len(world.stars) < 2 and star_chance_30:
+        world.stars.append(create_star())
+    elif world.score >= 20 and len(world.stars) < 1 and star_chance_20:
+        world.stars.append(create_star())
+    elif world.score >= 8 and len(world.stars) < 1 and star_chance_10:
+        world.stars.append(create_star())
+
+
+
+
 
 
 
@@ -184,8 +227,7 @@ def collide_star_hero(world: World):
     for star in world.stars:
         if colliding(star, world.hero):
             destroyed_stars.append(star)
-            #world.score += 1
-            print("Need to add powerup laser")
+            world.is_special = True
     world.stars = filter_from(world.stars, destroyed_stars)
 
 def filter_from(old_list: list[DesignerObject], elements_to_not_keep: list[DesignerObject]) -> list[DesignerObject]:
@@ -221,6 +263,8 @@ when("updating", zombie_run)
 when('updating', collide_laser_zombie)
 when("updating", collide_laser_speed_zombie)
 when("updating", collide_star_hero)
+when("typing", shoot_special_laser)
+when("updating", move_special_laser)
 when("updating", update_score)
 when(zombies_cross_the_line, flash_game_over, pause)
 start()
