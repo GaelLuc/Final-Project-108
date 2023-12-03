@@ -1,9 +1,21 @@
 # Gael Lucero
-### gael@udel.edu
+### gael@udel.edu (Author)
 
 #
 ## Last Stand: Home Defender
 #### Is a game where you are the last person in the zombie apocalypse and you are defending your house. By shooting the zombies, causing them to be destroyed
+
+## About
+#### The game is protecting your house from the zombies, by shooting them with your lasers. As the more zombies you kill the more will come. However the more powerups you will get.
+
+## Preview
+#### Game Play video: https://youtu.be/PAJ9sRMzQpI
+
+## Instructions
+#### "up" key moves the hero up. "down" key moves your hero down. "Space" key shoots the laser
+
+## Acknowledgements
+#### Designer Website: https://designer-edu.github.io/designer/quickstart/quickstart.html
 
 ### Phase 1: 
 - [x] There is a Hero on the screen

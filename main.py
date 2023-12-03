@@ -159,7 +159,7 @@ def make_stars_randomly(world: World):
 
 def create_zomie() -> DesignerObject:
     """ Create a zombie randomly on the right-side of the screen """
-    zombie = emoji("👻")
+    zombie = emoji("zombie")
     zombie.scale_x = 1
     zombie.scale_y = 1
     zombie.anchor = 'midbottom'
