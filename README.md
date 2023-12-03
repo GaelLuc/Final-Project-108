@@ -23,9 +23,10 @@
 #### Link to Demo: https://youtu.be/6Jk7fc9d9ys
 
 ### Phase 3
-- [ ] Power up randomly shows up in the little area where the Hero will be
-- [ ] when the Hero collides with the power up then the next laser will go through all of the zombies killing them and getting destroyed when it gets offscreen
-- [ ] Figure out where should be that “line” where zombies must not cross
-- [ ] When a Zombie crosses that line, then the game will be over
-- [ ] A message is displayed when a zombie crosses the line
-- [ ] The current score is shown in the game
+- [x] Power up randomly shows up in the little area where the Hero will be
+- [x] when the Hero collides with the power up then the next laser will go through all of the zombies killing them and getting destroyed when it gets offscreen
+- [x] Figure out where should be that “line” where zombies must not cross
+- [x] When a Zombie crosses that line, then the game will be over
+- [x] A message is displayed when a zombie crosses the line
+- [x] The current score is shown in the game
+#### Link to Demo: https://youtu.be/YfAOOWbBrRo
